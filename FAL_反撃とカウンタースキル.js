@@ -150,8 +150,8 @@ FAL.Param.permitSubstituteRCnt = FAL.Parameters['Permit Substitute Received Coun
                 var targets = action.makeTargets();
                 targets.forEach(function(v){
                     action.apply(v);
-                    BattleManager._logWindow.displayActionResults(target._counterSkill.battler, v);
-                });
+                    this._logWindow.displayActionResults(target._counterSkill.battler, v);
+                }, this);
             }
             target._counterSkill.counts--;
             if (target._counterSkill.counts < 1) {
