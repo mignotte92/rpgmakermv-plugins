@@ -2,7 +2,7 @@
  * @plugindesc 世界樹のような属性チェイス攻撃を実装します。
  * ステート付与スキル、攻撃実体スキル、チェイス待ちステートが必要です。
  * @author FAL
- * @version 0.1
+ * @version 0.2
  *
  * @help
  * ======================================================
@@ -169,7 +169,7 @@ FAL.Param.isRemoveChaseStanceState = FAL.Parameters['Remove Chase Stance State']
             
             if (chasers.length !== 0) {
                 for (var i = 0; i < chasers.length; i++) {
-                    if (chasers[i]._chaseElement.chaseRate > Math.random()) {
+                    if (target.isAlive() && chasers[i]._chaseElement.chaseRate > Math.random()) {
                         this._logWindow.push('performChaseAction', this.invokeChaseAction, this, chasers[i], target, chasers[i]._chaseElement.skillId, eleId);
                         chasers[i]._chaseElement.chaseRate *= chasers[i]._chaseElement.decayRate;
                     } else {
