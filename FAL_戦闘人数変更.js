@@ -1,7 +1,7 @@
 /*:
  * @plugindesc 戦闘参加人数を変更し、隊列の概念を導入します
  * @author FAL
- * @version 0.1
+ * @version 0.2
  *
  * @help
  * =================================================================
@@ -72,7 +72,7 @@ FAL.Param.backGainDamageReduceRate = Number(FAL.Parameters['Back Gain Damage Red
 (function() {
     
     Game_Party.prototype.maxBattleMembers = function() {
-        return FAL.Param.numFrontBattleMembers + FAL.Param.numBackBattleMembers;
+        return FAL.Param.numFrontBattleMembers + FAL.Param.numBackBattleMembers; // default 4
     }
     
     Game_Action.prototype.evalDamageFormula = function(target) {
@@ -84,7 +84,7 @@ FAL.Param.backGainDamageReduceRate = Number(FAL.Parameters['Back Gain Damage Red
             var sign = ([3, 4].contains(item.damage.type) ? -1 : 1);
             var damage = Math.max(eval(item.damage.formula), 0) * sign;
             
-            if (sign > 0) {
+            if (sign > 0 && FAL.Param.numBackBattleMembers > 0) {
                 if (a.isActor() && b.isEnemy() && $gameParty.battleMembers().indexOf(a) >= FAL.Param.numFrontBattleMembers) {
                     if (item.id === 1) {
                         if (!FAL.Param.rangedWeapons.contains(a.weapons()[0]?a.weapons()[0].wtype:-1)) {
@@ -127,11 +127,20 @@ FAL.Param.backGainDamageReduceRate = Number(FAL.Parameters['Back Gain Damage Red
     }
     
     /////////////////////////////////////////////////////////////////////////////////////////////
+    // 共用関数
+    FAL.ajustNumByNumOfBattleMembers = function(defaultNum) {
+        return Math.min(
+            Math.floor(defaultNum * (4/(FAL.Param.numFrontBattleMembers + FAL.Param.numBackBattleMembers))),
+            defaultNum
+        );
+    }
+    
+    /////////////////////////////////////////////////////////////////////////////////////////////
     // 戦闘画面の暫定対処
     var _Window_BattleStatus_initialize = Window_BattleStatus.prototype.initialize;
     Window_BattleStatus.prototype.initialize = function() {
         _Window_BattleStatus_initialize.call(this);
-        this.contents.fontSize = Math.floor(28 * (4/(FAL.Param.numFrontBattleMembers + FAL.Param.numBackBattleMembers))); // default 28
+        this.contents.fontSize = FAL.ajustNumByNumOfBattleMembers(28); // default 28
     }
     
     Window_BattleStatus.prototype.lineHeight = function() {
@@ -142,12 +151,16 @@ FAL.Param.backGainDamageReduceRate = Number(FAL.Parameters['Back Gain Damage Red
         return FAL.Param.numFrontBattleMembers + FAL.Param.numBackBattleMembers; // default 4
     }
     
+    Window_BattleStatus.prototype.maxCols = function() {
+        return 1; // default 1
+    }
+    
     /////////////////////////////////////////////////////////////////////////////////////////////
     // メニュー画面の暫定対処
     var _Window_MenuStatus_initialize = Window_MenuStatus.prototype.initialize;
     Window_MenuStatus.prototype.initialize = function(x, y) {
         _Window_MenuStatus_initialize.call(this, x, y);
-        this.contents.fontSize = Math.floor(28 * (4/(FAL.Param.numFrontBattleMembers + FAL.Param.numBackBattleMembers))); // default 28
+        this.contents.fontSize = FAL.ajustNumByNumOfBattleMembers(28); // default 28
     }
     
     Window_MenuStatus.prototype.lineHeight = function() {
@@ -156,7 +169,6 @@ FAL.Param.backGainDamageReduceRate = Number(FAL.Parameters['Back Gain Damage Red
     
     Window_MenuStatus.prototype.numVisibleRows = function() {
         return FAL.Param.numFrontBattleMembers + FAL.Param.numBackBattleMembers; // default 4
-        //return Math.max(FAL.Param.numFrontBattleMembers, FAL.Param.numBackBattleMembers);
     };
     
     Window_MenuStatus.prototype.maxCols = function() {
