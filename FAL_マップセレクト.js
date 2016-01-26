@@ -46,6 +46,18 @@
  * 
  * ================================================================
  * 
+ * @param Window Width
+ * @desc マップセレクトウィンドウの横幅
+ * @default 408
+ * 
+ * @param Visible Cols
+ * @desc マップセレクトウィンドウの表示列数
+ * @default 1
+ * 
+ * @param Visible Rows
+ * @desc マップセレクトウィンドウの表示行数
+ * @default 3
+ * 
  */
 
 var Imported = Imported || {};
@@ -55,6 +67,10 @@ var FAL = FAL || {};
 
 FAL.Parameters = PluginManager.parameters('FAL_マップセレクト');
 FAL.Param = FAL.Param || {};
+
+FAL.Param.MapSelectWindowWidth = Number(FAL.Parameters['Window Width']);
+FAL.Param.MapSelectWindowCols = Number(FAL.Parameters['Visible Cols']);
+FAL.Param.MapSelectWindowRows = Number(FAL.Parameters['Visible Rows']);
 
 FAL.Param.MapSelect = {};
 FAL.Param.MapSelect.isMapSelect = false;
@@ -79,15 +95,15 @@ FAL.Param.MapSelect.selectedIndex = 0;
     }
     
     Window_MapSelect.prototype.windowWidth = function() {
-        return Graphics.boxWidth / 2;
+        return FAL.Param.MapSelectWindowWidth;
     }
     
     Window_MapSelect.prototype.maxCols = function() {
-        return 1;
+        return FAL.Param.MapSelectWindowCols;
     }
     
     Window_MapSelect.prototype.numVisibleRows = function() {
-        return 8;
+        return FAL.Param.MapSelectWindowRows;
     }
     
     Window_MapSelect.prototype.makeCommandList = function() {
