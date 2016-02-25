@@ -2,8 +2,10 @@
  * @plugindesc 世界樹のような属性チェイス攻撃を実装します。
  * ステート付与スキル、攻撃実体スキル、チェイス待ちステートが必要です。
  * @author FAL
- * @version 0.2
- *
+ * @version 0.3 チェイス攻撃が属性も追従するかどうかの設定を追加
+ *               0.2 対象が死んでいたら発動しないように変更
+ *               0.1 公開
+ * 
  * @help
  * ======================================================
  * 世界樹の迷宮にあるような特定の属性スキルの発動に対して追撃を行うスキルです。
@@ -33,6 +35,11 @@
  * @param Remove Chase Stance State
  * @desc 上記の減衰の影響でチェイスしなかった時にステートを解除するかどうか
  * falseの場合、確率は下がるがチェイス状態は維持される
+ * @default true
+ * 
+ * @param Follow Chase Attack Element
+ * @desc 属性攻撃にチェイスした時、その攻撃属性をチェイス元属性に追従するかどうか
+ * falseの場合、チェイスアタックの属性はスキルの設定に従います
  * @default true
  * 
  * @param === Chase EleId 2 =========
@@ -156,6 +163,7 @@ if (FAL.Param.defaultChaseDecayRate > 1) {
     FAL.Param.defaultChaseDecayRate = 0;
 }
 FAL.Param.isRemoveChaseStanceState = FAL.Parameters['Remove Chase Stance State'] === 'true';
+FAL.Param.isFollowChaseAttackElement = FAL.Parameters['Follow Chase Attack Element'] === 'true';
 
 (function() {
     
@@ -192,6 +200,9 @@ FAL.Param.isRemoveChaseStanceState = FAL.Parameters['Remove Chase Stance State']
     BattleManager.invokeChaseAction = function(chaser, target, actionId, elementId) {
         var action = new Game_Action(chaser);
         action.setSkill(actionId);
+        if (FAL.Param.isFollowChaseAttackElement) {
+            action.item().damage.elementId = elementId;
+        }
         action.apply(target);
         this._logWindow.displayChaseAction(elementId);
         this._logWindow.displayActionResults(chaser, target);
